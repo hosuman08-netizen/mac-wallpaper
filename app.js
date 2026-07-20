@@ -223,13 +223,13 @@
     canvas.width = pw;
     canvas.height = ph;
     drawStyle(ctx, pw, ph, state.style, state.seed, state.bright);
-    var dl=0,sc=0;try{dl=+(localStorage.getItem('mw_dl')||0);sc=(JSON.parse(localStorage.getItem('mw_streak')||'{}').count||0)}catch(e){}
+    var dl=0,sc=0,tdl=0;try{dl=+(localStorage.getItem('mw_dl')||0);sc=(JSON.parse(localStorage.getItem('mw_streak')||'{}').count||0);tdl=+(localStorage.getItem('mw_day_dl_'+dayKey())||0)}catch(e){}
     document.getElementById('hint').textContent =
-      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'') + (sc?' · 🔥'+sc+'일':'') + ' · 오늘의 시드';
+      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'') + (tdl?' · 오늘 '+tdl:'') + (sc?' · 🔥'+sc+'일':'') + ' · 오늘의 시드';
   }
 
   function downloadFull() {
-    try{var n=+(localStorage.getItem('mw_dl')||0)+1;localStorage.setItem('mw_dl',n);}catch(e){}
+    try{var n=+(localStorage.getItem('mw_dl')||0)+1;localStorage.setItem('mw_dl',n); var dk='mw_day_dl_'+dayKey(); localStorage.setItem(dk,String((+(localStorage.getItem(dk)||0))+1));}catch(e){}
     var st=bumpDlStreak();
     var off = document.createElement('canvas');
     off.width = state.size.w;
