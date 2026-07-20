@@ -7,7 +7,8 @@
     { id: 'mbp15', label: '2880×1800', w: 2880, h: 1800 },
     { id: '2k', label: '2560×1600', w: 2560, h: 1600 },
     { id: 'fhd', label: '1920×1080', w: 1920, h: 1080 },
-    { id: 'sq', label: '1080×1080', w: 1080, h: 1080 }
+    { id: 'sq', label: '1080×1080', w: 1080, h: 1080 },
+    { id: 'imac24', label: 'iMac 24"', w: 4480, h: 2520 }
   ];
   var STYLES = [
     { id: 'legion', label: 'Legion Gold' },
@@ -17,7 +18,9 @@
     { id: 'ocean', label: 'Deep Ocean' },
     { id: 'ember', label: 'Ember' },
     { id: 'neon', label: 'Neon Grid' },
-    { id: 'sakura', label: 'Sakura Dusk' }
+    { id: 'sakura', label: 'Sakura Dusk' },
+    { id: 'mist', label: 'Fog Mist' },
+    { id: 'cyber', label: 'Cyber Violet' }
   ];
   var state = {
     size: SIZES[0],
@@ -148,6 +151,34 @@
         ctx.arc(rnd()*w, rnd()*h, 8+rnd()*24, 0, Math.PI*2);
         ctx.fill();
       }
+
+    } else if (style === 'mist') {
+      var mgg = ctx.createLinearGradient(0, 0, 0, h);
+      mgg.addColorStop(0, col(210, 12, 22));
+      mgg.addColorStop(1, col(220, 8, 8));
+      ctx.fillStyle = mgg; ctx.fillRect(0,0,w,h);
+      for (var mi = 0; mi < 10; mi++) {
+        var mgr = ctx.createRadialGradient(rnd()*w, rnd()*h, 0, rnd()*w, rnd()*h, w*(0.25+rnd()*0.3));
+        mgr.addColorStop(0, col(200, 8, 55, 0.12));
+        mgr.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = mgr; ctx.fillRect(0,0,w,h);
+      }
+    } else if (style === 'cyber') {
+      ctx.fillStyle = col(265, 50, 6);
+      ctx.fillRect(0,0,w,h);
+      for (var cy = 0; cy < 18; cy++) {
+        ctx.strokeStyle = col(280+cy*3, 90, 55, 0.12+rnd()*0.1);
+        ctx.lineWidth = 1+rnd()*2;
+        ctx.beginPath();
+        var yb = rnd()*h;
+        ctx.moveTo(0, yb);
+        for (var cx = 0; cx <= w; cx += w/30) ctx.lineTo(cx, yb + Math.sin(cx*0.01+cy)*h*0.04);
+        ctx.stroke();
+      }
+      var cg = ctx.createRadialGradient(w*0.2, h*0.8, 0, w*0.2, h*0.8, w*0.55);
+      cg.addColorStop(0, col(300, 90, 50, 0.3));
+      cg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = cg; ctx.fillRect(0,0,w,h);
     } else if (style === 'ember') {
       var eg = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.5, h);
       eg.addColorStop(0, col(25, 90, 48));
