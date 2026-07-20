@@ -1,3 +1,6 @@
+
+/* LEGION_WAVE_85_session_counter */
+try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorage.setItem('lw_p45_mac_wall_session_counter','1');localStorage.setItem('lw_p45_mac_wall_session_counter',String((+(localStorage.getItem('lw_p45_mac_wall_session_counter')||0))+1));}}catch(e){}
 (function () {
   'use strict';
   var SIZES = [
