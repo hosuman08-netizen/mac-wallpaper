@@ -253,6 +253,11 @@
     paintPreview();
   };
   document.getElementById('regen').onclick = function () { paintPreview(); try { legionTrack('activate', { regen: 1 }); } catch (e) {} };
+  if(!document.getElementById('randStyle')){
+    var rs=document.createElement('button'); rs.id='randStyle'; rs.className='sec'; rs.textContent='스타일 랜덤';
+    rs.onclick=function(){ state.style=STYLES[Math.floor(Math.random()*STYLES.length)].id; renderChips(); paintPreview(); };
+    document.getElementById('rand').parentNode.appendChild(rs);
+  }
   document.getElementById('rand').onclick = function () {
     state.seed = Math.floor(Math.random() * 999999);
     document.getElementById('seed').value = state.seed;
