@@ -14,7 +14,9 @@
     { id: 'mesh', label: 'Soft Mesh' },
     { id: 'minimal', label: 'Minimal Dark' },
     { id: 'ocean', label: 'Deep Ocean' },
-    { id: 'ember', label: 'Ember' }
+    { id: 'ember', label: 'Ember' },
+    { id: 'neon', label: 'Neon Grid' },
+    { id: 'sakura', label: 'Sakura Dusk' }
   ];
   var state = {
     size: SIZES[0],
@@ -120,6 +122,30 @@
         org.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = org;
         ctx.fillRect(0, 0, w, h);
+      }
+    } else if (style === 'neon') {
+      ctx.fillStyle = col(250, 40, 5);
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = col(170, 90, 55, 0.35);
+      ctx.lineWidth = 1;
+      var step = Math.max(40, w / 48);
+      for (var nx = 0; nx < w; nx += step) { ctx.beginPath(); ctx.moveTo(nx, 0); ctx.lineTo(nx, h); ctx.stroke(); }
+      for (var ny = 0; ny < h; ny += step) { ctx.beginPath(); ctx.moveTo(0, ny); ctx.lineTo(w, ny); ctx.stroke(); }
+      var ng = ctx.createRadialGradient(w*0.7, h*0.3, 0, w*0.7, h*0.3, w*0.5);
+      ng.addColorStop(0, col(300, 80, 50, 0.25));
+      ng.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ng; ctx.fillRect(0,0,w,h);
+    } else if (style === 'sakura') {
+      var sg = ctx.createLinearGradient(0, 0, w, h);
+      sg.addColorStop(0, col(330, 35, 18));
+      sg.addColorStop(0.5, col(20, 40, 22));
+      sg.addColorStop(1, col(250, 25, 8));
+      ctx.fillStyle = sg; ctx.fillRect(0,0,w,h);
+      for (var s = 0; s < 40; s++) {
+        ctx.beginPath();
+        ctx.fillStyle = col(340, 50, 70, 0.08 + rnd()*0.1);
+        ctx.arc(rnd()*w, rnd()*h, 8+rnd()*24, 0, Math.PI*2);
+        ctx.fill();
       }
     } else if (style === 'ember') {
       var eg = ctx.createRadialGradient(w * 0.5, h * 0.85, 0, w * 0.5, h * 0.5, h);
