@@ -312,6 +312,34 @@
     rs.onclick=function(){ state.style=STYLES[Math.floor(Math.random()*STYLES.length)].id; renderChips(); paintPreview(); };
     document.getElementById('rand').parentNode.appendChild(rs);
   }
+  if(!document.getElementById('styleOfDay')){
+    var sd=document.createElement('button'); sd.id='styleOfDay'; sd.className='sec'; sd.textContent='오늘의 스타일';
+    sd.onclick=function(){
+      var t=dayKey(); var h=0; for(var i=0;i<t.length;i++) h=(h*31+t.charCodeAt(i))>>>0;
+      state.style=STYLES[h%STYLES.length].id;
+      if(!localStorage.getItem('mw_seed_touched')){
+        state.seed=(h%900000)+42;
+        document.getElementById('seed').value=state.seed;
+      }
+      renderChips(); paintPreview();
+      try{legionTrack('activate',{sod:1,style:state.style})}catch(e){}
+    };
+    document.getElementById('rand').parentNode.appendChild(sd);
+  }
+  // collection progress: unique styles downloaded
+  function styleCollection(){
+    try{
+      var set={};
+      STYLES.forEach(function(s){ var c=+(localStorage.getItem('mw_style_dl_'+s.id)||0); if(c>0) set[s.id]=1; });
+      var n=Object.keys(set).length;
+      var el=document.getElementById('styleColl');
+      if(!el){
+        el=document.createElement('p'); el.id='styleColl'; el.className='hint';
+        var hint=document.getElementById('hint'); if(hint&&hint.parentNode) hint.parentNode.appendChild(el);
+      }
+      el.textContent='컬렉션 '+n+'/'+STYLES.length+' 스타일 수집'+(n>=STYLES.length?' · 완료!':' · 다운으로 채우기');
+    }catch(e){}
+  }
   document.getElementById('rand').onclick = function () {
     state.seed = Math.floor(Math.random() * 999999);
     document.getElementById('seed').value = state.seed;
