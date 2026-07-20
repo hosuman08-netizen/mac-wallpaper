@@ -220,6 +220,16 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     }
   }
 
+  function styleOfDay(){
+    var styles=['nebula','ember','aurora','grid','mist','ocean','paper','noir'];
+    try{
+      // use existing STYLES if present
+      if(typeof STYLES!=='undefined' && STYLES.length) styles=STYLES.map(function(s){return s.id||s;});
+    }catch(e){}
+    var t=dayKey(); var h=0; for(var i=0;i<t.length;i++) h=(h*31+t.charCodeAt(i))>>>0;
+    return styles[h%styles.length];
+  }
+
   function paintPreview() {
     try{var dk=new Date().toDateString();if(localStorage.getItem('mw_dayseed')!==dk){localStorage.setItem('mw_dayseed',dk);state.seed=(state.seed|0)+7;var se=document.getElementById('seed');if(se)se.value=state.seed;}}catch(e){}
     var pw = 1280, ph = Math.round(1280 * state.size.h / state.size.w);
@@ -227,8 +237,9 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     canvas.height = ph;
     drawStyle(ctx, pw, ph, state.style, state.seed, state.bright);
     var dl=0,sc=0,tdl=0;try{dl=+(localStorage.getItem('mw_dl')||0);sc=(JSON.parse(localStorage.getItem('mw_streak')||'{}').count||0);tdl=+(localStorage.getItem('mw_day_dl_'+dayKey())||0)}catch(e){}
+    var sod=styleOfDay(); var sodOk=state.style===sod;
     document.getElementById('hint').textContent =
-      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'') + (tdl?' · 오늘 '+tdl:'') + (sc?' · 🔥'+sc+'일':'') + ' · 오늘의 시드';
+      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'') + (tdl?' · 오늘 '+tdl:'') + (sc?' · 🔥'+sc+'일':'') + ' · 오늘 스타일 ' + sod + (sodOk?' ✓':'') + ' · 시드';
   }
 
   function downloadFull() {
@@ -258,6 +269,7 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
       }catch(e){}
       paintPreview();
       pushDlHist();
+      try{if(state.style===styleOfDay()){localStorage.setItem('mw_sod_'+dayKey(),'1'); legionTrack && legionTrack('style_day',{style:state.style});}}catch(e){}
       try { if (window.legionTrack) legionTrack('activate', { dl: 1, style: state.style, w: state.size.w, streak: st.count||0 }); } catch (e) {}
       try { if (window.legionTrack) legionTrack('share_peak_shown', { style: state.style }); } catch (e) {}
       // soft share nudge
