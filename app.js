@@ -407,8 +407,12 @@
       kid=localStorage.getItem('mw_k_id');
       if(!kid){kid='m'+Math.random().toString(36).slice(2,8);localStorage.setItem('mw_k_id',kid);}
     }catch(e){}
-    var url = 'https://hosuman08-netizen.github.io/mac-wallpaper/?style=' + encodeURIComponent(state.style) + '&seed=' + state.seed + '&ref=' + encodeURIComponent(kid);
-    var text = 'Mac Wallpaper · ' + state.style + ' seed ' + state.seed + '\n' + url;
+    var url = 'https://hosuman08-netizen.github.io/mac-wallpaper/?style=' + encodeURIComponent(state.style)
+      + '&seed=' + state.seed
+      + '&bright=' + encodeURIComponent(state.bright)
+      + '&size=' + encodeURIComponent(state.size.id)
+      + '&ref=' + encodeURIComponent(kid);
+    var text = 'Mac Wallpaper · ' + state.style + ' seed ' + state.seed + ' · ' + state.size.w + '×' + state.size.h + '\n' + url;
     if (navigator.share) navigator.share({text:text,url:url}).catch(function(){ if(navigator.clipboard) navigator.clipboard.writeText(text); });
     else if (navigator.clipboard) navigator.clipboard.writeText(text);
     try { legionTrack('share_peak', { style: state.style, k: 1 }); } catch (e) {}
@@ -469,18 +473,28 @@
     }catch(e){return {count:0};}
   }
 
-  // URL params
+  // URL params (full state restore: style/seed/bright/size)
   try {
     var q = new URLSearchParams(location.search);
     if (q.get('style')) state.style = q.get('style');
-    if (q.get('seed')) state.seed = +q.get('seed') || state.seed;
+    if (q.get('seed')) { state.seed = +q.get('seed') || state.seed; try{localStorage.setItem('mw_seed_touched','1');}catch(e){} }
     else if (!localStorage.getItem('mw_seed_touched')) {
       // seed of day (deterministic)
       var t=dayKey();
       var h=0; for(var i=0;i<t.length;i++) h=(h*31+t.charCodeAt(i))>>>0;
       state.seed = (h % 900000) + 42;
     }
+    if (q.get('bright')) {
+      var br = +q.get('bright');
+      if (br >= 60 && br <= 140) state.bright = br;
+    }
+    if (q.get('size')) {
+      var sz = SIZES.find(function (x) { return x.id === q.get('size'); });
+      if (sz) state.size = sz;
+    }
     document.getElementById('seed').value = state.seed;
+    var brightEl = document.getElementById('bright');
+    if (brightEl) brightEl.value = state.bright;
   } catch (e) {}
 
   try{
