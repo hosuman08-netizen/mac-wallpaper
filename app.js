@@ -233,6 +233,7 @@
         }
       }catch(e){}
       paintPreview();
+      pushDlHist();
       try { if (window.legionTrack) legionTrack('activate', { dl: 1, style: state.style, w: state.size.w, streak: st.count||0 }); } catch (e) {}
       try { if (window.legionTrack) legionTrack('share_peak_shown', { style: state.style }); } catch (e) {}
       // soft share nudge
@@ -335,11 +336,52 @@
     document.getElementById('share').parentNode.appendChild(cs);
   }
   document.getElementById('share').onclick = function () {
-    var url = 'https://hosuman08-netizen.github.io/mac-wallpaper/?style=' + encodeURIComponent(state.style) + '&seed=' + state.seed;
-    if (navigator.clipboard) navigator.clipboard.writeText(url);
-    try { legionTrack('share_peak', { style: state.style }); } catch (e) {}
-    alert('링크 복사됨');
+    var kid='';
+    try{
+      kid=localStorage.getItem('mw_k_id');
+      if(!kid){kid='m'+Math.random().toString(36).slice(2,8);localStorage.setItem('mw_k_id',kid);}
+    }catch(e){}
+    var url = 'https://hosuman08-netizen.github.io/mac-wallpaper/?style=' + encodeURIComponent(state.style) + '&seed=' + state.seed + '&ref=' + encodeURIComponent(kid);
+    var text = 'Mac Wallpaper · ' + state.style + ' seed ' + state.seed + '\n' + url;
+    if (navigator.share) navigator.share({text:text,url:url}).catch(function(){ if(navigator.clipboard) navigator.clipboard.writeText(text); });
+    else if (navigator.clipboard) navigator.clipboard.writeText(text);
+    try { legionTrack('share_peak', { style: state.style, k: 1 }); } catch (e) {}
+    var n=document.getElementById('hint'); if(n) n.textContent='공유 링크 복사 · K-ref ON';
   };
+  // last downloads quick restore strip
+  function pushDlHist(){
+    try{
+      var h=JSON.parse(localStorage.getItem('mw_dl_hist')||'[]');
+      h.unshift({style:state.style,seed:state.seed,bright:state.bright,sizeId:state.size.id,t:Date.now()});
+      localStorage.setItem('mw_dl_hist',JSON.stringify(h.slice(0,8)));
+      renderDlHist();
+    }catch(e){}
+  }
+  function renderDlHist(){
+    try{
+      var box=document.getElementById('dlHist');
+      if(!box){
+        box=document.createElement('div'); box.id='dlHist'; box.className='row'; box.style.cssText='gap:6px;flex-wrap:wrap;margin-top:8px';
+        var fav=document.getElementById('favList'); if(fav&&fav.parentNode) fav.parentNode.appendChild(box);
+        else (document.getElementById('app')||document.body).appendChild(box);
+      }
+      var h=JSON.parse(localStorage.getItem('mw_dl_hist')||'[]');
+      if(!h.length){box.innerHTML='<span class="hint">최근 다운로드 없음</span>';return;}
+      box.innerHTML='<span class="hint">최근 DL · </span>'+h.slice(0,5).map(function(f,i){
+        return '<button type="button" class="chip" data-dlh="'+i+'">'+f.style+'·'+f.seed+'</button>';
+      }).join('');
+      Array.prototype.forEach.call(box.querySelectorAll('[data-dlh]'),function(b){
+        b.onclick=function(){
+          var f=h[+b.getAttribute('data-dlh')]; if(!f)return;
+          state.style=f.style; state.seed=f.seed; state.bright=f.bright||100;
+          var sz=SIZES.find(function(x){return x.id===f.sizeId;}); if(sz) state.size=sz;
+          document.getElementById('seed').value=state.seed;
+          document.getElementById('bright').value=state.bright;
+          renderChips(); paintPreview();
+        };
+      });
+    }catch(e){}
+  }
 
   // daily seed of day + streak helpers
   function dayKey(){
@@ -375,9 +417,15 @@
     document.getElementById('seed').value = state.seed;
   } catch (e) {}
 
+  try{
+    var qref=new URLSearchParams(location.search||'');
+    var ref=qref.get('ref');
+    if(ref && !localStorage.getItem('mw_k_from')){ localStorage.setItem('mw_k_from',ref); try{legionTrack('k_link',{from:ref})}catch(e){} }
+  }catch(e){}
   renderChips();
   renderFavs();
   paintPreview();
+  renderDlHist();
   try { legionTrack('session_start', { app: 'mac-wallpaper' }); } catch (e) {}
 
   (function(){try{
