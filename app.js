@@ -1,6 +1,7 @@
 (function () {
   'use strict';
   var SIZES = [
+    { id: 'mac13', label: '13\" Air', w: 2560, h: 1664 },
     { id: 'mac14', label: '14\" Retina', w: 3024, h: 1964 },
     { id: 'mac16', label: '16\" Retina', w: 3456, h: 2234 },
     { id: 'mbp15', label: '2880×1800', w: 2880, h: 1800 },
