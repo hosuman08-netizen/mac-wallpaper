@@ -374,6 +374,15 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     document.getElementById('rand').parentNode.appendChild(ps);
     document.getElementById('rand').parentNode.appendChild(ns);
   }
+  if(!document.getElementById('prevSize')){
+    function sizeIdx(){ for(var i=0;i<SIZES.length;i++) if(SIZES[i].id===state.size.id) return i; return 0; }
+    var psz=document.createElement('button'); psz.id='prevSize'; psz.className='sec'; psz.textContent='◀ 해상도';
+    psz.onclick=function(){ pushSeedSnap(); state.size=SIZES[(sizeIdx()-1+SIZES.length)%SIZES.length]; renderChips(); paintPreview(); try{legionTrack('size_nav',{d:-1})}catch(e){} };
+    var nsz=document.createElement('button'); nsz.id='nextSize'; nsz.className='sec'; nsz.textContent='해상도 ▶';
+    nsz.onclick=function(){ pushSeedSnap(); state.size=SIZES[(sizeIdx()+1)%SIZES.length]; renderChips(); paintPreview(); try{legionTrack('size_nav',{d:1})}catch(e){} };
+    document.getElementById('rand').parentNode.appendChild(psz);
+    document.getElementById('rand').parentNode.appendChild(nsz);
+  }
   if(!document.getElementById('styleOfDay')){
     var sd=document.createElement('button'); sd.id='styleOfDay'; sd.className='sec'; sd.textContent='오늘의 스타일';
     sd.onclick=function(){
