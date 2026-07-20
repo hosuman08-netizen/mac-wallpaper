@@ -259,6 +259,11 @@
     paintPreview();
   };
   document.getElementById('dl').onclick = downloadFull;
+  if(!document.getElementById('dlMac14')){
+    var b=document.createElement('button'); b.id='dlMac14'; b.className='sec'; b.textContent='14" 바로 받기';
+    b.onclick=function(){ state.size=SIZES[0]; renderChips(); paintPreview(); downloadFull(); };
+    document.getElementById('dl').parentNode.appendChild(b);
+  }
   document.getElementById('fav').onclick = function () {
     var favs = loadFavs();
     favs.unshift({ style: state.style, seed: state.seed, bright: state.bright, sizeId: state.size.id, t: Date.now() });
