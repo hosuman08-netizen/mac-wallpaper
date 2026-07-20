@@ -240,6 +240,7 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     var sod=styleOfDay(); var sodOk=state.style===sod;
     document.getElementById('hint').textContent =
       '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'') + (tdl?' · 오늘 '+tdl:'') + (sc?' · 🔥'+sc+'일':'') + ' · 오늘 스타일 ' + sod + (sodOk?' ✓':'') + ' · 시드';
+    try{ pushStyleHist(); styleCollection(); weekDlSpark(); }catch(e){}
   }
 
   function downloadFull() {
@@ -417,6 +418,38 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
         var hint=document.getElementById('hint'); if(hint&&hint.parentNode) hint.parentNode.appendChild(el);
       }
       el.textContent='컬렉션 '+n+'/'+STYLES.length+' 스타일 수집'+(n>=STYLES.length?' · 완료!':' · 다운으로 채우기');
+      // recent style+seed re-roll (loop)
+      var hist=[];
+      try{ hist=JSON.parse(localStorage.getItem('mw_style_hist')||'[]'); }catch(e){}
+      var strip=document.getElementById('styleHist');
+      if(!strip){
+        strip=document.createElement('div'); strip.id='styleHist';
+        strip.style.cssText='display:flex;flex-wrap:wrap;gap:6px;margin-top:6px';
+        if(el.parentNode) el.parentNode.appendChild(strip);
+      }
+      strip.innerHTML=hist.slice(0,5).map(function(h,i){
+        return '<button type="button" class="sec" data-rh="'+i+'" style="padding:6px 10px;font-size:11px">'+(h.style||'?')+' #'+String(h.seed).slice(0,4)+'</button>';
+      }).join('')||'<span class="hint">생성하면 최근 시드가 여기 쌓입니다</span>';
+      Array.prototype.forEach.call(strip.querySelectorAll('[data-rh]'),function(b){
+        b.onclick=function(){
+          var h=hist[+b.getAttribute('data-rh')]; if(!h)return;
+          pushSeedSnap();
+          state.style=h.style; state.seed=h.seed; state.bright=h.bright!=null?h.bright:state.bright;
+          document.getElementById('seed').value=state.seed;
+          if(document.getElementById('bright')) document.getElementById('bright').value=state.bright;
+          renderChips(); paintPreview();
+          try{legionTrack('activate',{reroll:1,style:h.style})}catch(e){}
+        };
+      });
+    }catch(e){}
+  }
+  function pushStyleHist(){
+    try{
+      var hist=JSON.parse(localStorage.getItem('mw_style_hist')||'[]');
+      hist.unshift({style:state.style,seed:state.seed,bright:state.bright,t:Date.now()});
+      // dedupe consecutive same
+      if(hist[1]&&hist[1].style===hist[0].style&&hist[1].seed===hist[0].seed) hist.splice(1,1);
+      localStorage.setItem('mw_style_hist',JSON.stringify(hist.slice(0,12)));
     }catch(e){}
   }
   document.getElementById('rand').onclick = function () {
