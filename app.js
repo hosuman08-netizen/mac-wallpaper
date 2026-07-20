@@ -220,6 +220,7 @@
   function renderFavs() {
     var list = document.getElementById('favList');
     var favs = loadFavs();
+    var fc=document.getElementById('favCount'); if(fc) fc.textContent=favs.length?'· '+favs.length:'';
     if (!favs.length) {
       list.innerHTML = '<span class="hint">없음 · 마음에 들면 즐겨찾기</span>';
       return;
