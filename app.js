@@ -389,6 +389,41 @@
     b.onclick=function(){ state.size=SIZES[0]; renderChips(); paintPreview(); downloadFull(); };
     document.getElementById('dl').parentNode.appendChild(b);
   }
+  if(!document.getElementById('exportFavs')){
+    var ef=document.createElement('button'); ef.id='exportFavs'; ef.className='sec'; ef.textContent='⬇ 즐겨찾기';
+    ef.onclick=function(){
+      try{
+        var payload={app:'mac-wallpaper',exportedAt:new Date().toISOString(),favs:loadFavs()};
+        var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+        var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+        a.download='mac-favs-'+dayKey().replace(/\//g,'-')+'.json'; a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);},1500);
+        try{legionTrack('export',{n:loadFavs().length})}catch(e){}
+      }catch(e){}
+    };
+    document.getElementById('fav').parentNode.appendChild(ef);
+    var il=document.createElement('label'); il.className='sec'; il.style.cssText='display:inline-block;padding:11px 14px;border-radius:10px;cursor:pointer;font-weight:700';
+    il.textContent='⬆ 즐겨찾기 복원';
+    var fi=document.createElement('input'); fi.type='file'; fi.accept='application/json,.json'; fi.style.display='none';
+    fi.onchange=function(){
+      if(!fi.files||!fi.files[0])return;
+      var r=new FileReader();
+      r.onload=function(){
+        try{
+          var p=JSON.parse(r.result);
+          var arr=Array.isArray(p)?p:(p&&p.favs)||[];
+          if(!arr.length) throw new Error('empty');
+          var cur=loadFavs();
+          arr.forEach(function(f){ if(f&&f.style!=null) cur.unshift(f); });
+          saveFavs(cur); renderFavs();
+          try{legionTrack('import',{n:arr.length})}catch(e){}
+        }catch(e){ alert('즐겨찾기 JSON을 확인해 주세요'); }
+      };
+      r.readAsText(fi.files[0]); fi.value='';
+    };
+    il.appendChild(fi);
+    document.getElementById('fav').parentNode.appendChild(il);
+  }
   document.getElementById('fav').onclick = function () {
     var favs = loadFavs();
     favs.unshift({ style: state.style, seed: state.seed, bright: state.bright, sizeId: state.size.id, t: Date.now() });
