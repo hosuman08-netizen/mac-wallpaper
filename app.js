@@ -553,3 +553,4 @@
   }catch(e){}})();
 
 })();
+/* LEGION_WAVE_40_wave_stamp */ /* ship wave 40 2026-07-21T07:42:49 */
