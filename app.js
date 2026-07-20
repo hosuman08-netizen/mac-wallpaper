@@ -276,6 +276,11 @@
     renderFavs();
     try { legionTrack('activate', { fav: 1 }); } catch (e) {}
   };
+  if(!document.getElementById('copySeed')){
+    var cs=document.createElement('button'); cs.id='copySeed'; cs.className='sec'; cs.textContent='시드 복사';
+    cs.onclick=function(){ var text=state.style+' seed='+state.seed; if(navigator.clipboard)navigator.clipboard.writeText(text); };
+    document.getElementById('share').parentNode.appendChild(cs);
+  }
   document.getElementById('share').onclick = function () {
     var url = 'https://hosuman08-netizen.github.io/mac-wallpaper/?style=' + encodeURIComponent(state.style) + '&seed=' + state.seed;
     if (navigator.clipboard) navigator.clipboard.writeText(url);
