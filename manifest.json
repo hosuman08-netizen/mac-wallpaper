@@ -1,0 +1,9 @@
+{
+  "name": "Mac Wallpaper Lab",
+  "short_name": "MacWall",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0b10",
+  "theme_color": "#e0b552",
+  "lang": "ko"
+}

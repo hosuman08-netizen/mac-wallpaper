@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mac Wallpaper Lab · Legion</title>
+  <meta name="description" content="맥 월페이퍼 생성·다운로드. 해상도 프리셋, 그라데이션·메쉬·미니멀. 브라우저에서 바로."/>
+  <link rel="canonical" href="https://hosuman08-netizen.github.io/mac-wallpaper/"/>
+  <meta property="og:title" content="Mac Wallpaper Lab"/>
+  <meta property="og:description" content="설치 없이 맥 배경화면 만들기 · 다운로드 PNG"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <p class="sub">p45 · Mac Wallpaper Lab · Legion</p>
+    <h1>Mac Wallpaper</h1>
+    <p class="tag">해상도 고르고 · 스타일 고르고 · 받아서 바로 적용</p>
+  </header>
+
+  <main>
+    <section class="preview-wrap card">
+      <canvas id="c" width="1280" height="800" aria-label="wallpaper preview"></canvas>
+      <p class="hint" id="hint">미리보기 · 실제 다운로드는 선택 해상도</p>
+    </section>
+
+    <section class="card">
+      <h2>해상도 (Mac)</h2>
+      <div class="chips" id="sizes"></div>
+    </section>
+
+    <section class="card">
+      <h2>스타일</h2>
+      <div class="chips" id="styles"></div>
+    </section>
+
+    <section class="card">
+      <h2>시드 · 미세조정</h2>
+      <label class="lab">시드 <input id="seed" type="number" value="42"/></label>
+      <label class="lab">밝기 <input id="bright" type="range" min="60" max="140" value="100"/></label>
+      <div class="row">
+        <button type="button" class="primary" id="regen">다시 생성</button>
+        <button type="button" class="sec" id="rand">랜덤 시드</button>
+      </div>
+      <div class="row">
+        <button type="button" class="primary" id="dl">PNG 다운로드</button>
+        <button type="button" class="sec" id="fav">즐겨찾기</button>
+        <button type="button" class="sec" id="share">링크 복사</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>즐겨찾기 (로컬)</h2>
+      <div id="favList" class="fav-list"></div>
+    </section>
+
+    <section class="card how">
+      <h2>적용 방법</h2>
+      <ol>
+        <li>PNG 다운로드</li>
+        <li>시스템 설정 → 배경화면 → 폴더에서 선택</li>
+        <li>또는 Finder에서 우클릭 → 바탕화면 그림으로 설정</li>
+      </ol>
+    </section>
+  </main>
+
+  <p class="nav"><a href="https://hosuman08-netizen.github.io/legion-hub/">← Legion Arcade</a></p>
+  <footer>무료 도구 · 로컬 생성 · 서버 업로드 없음 · Legion p45</footer>
+
+  <script>window.LEGION_APP='mac-wallpaper';window.LEGION_ANALYTICS_URL='https://legion-analytics.hoyashi95.workers.dev';</script>
+  <script src="legion-beacon.js"></script>
+  <script src="app.js"></script>
+  <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){});}</script>
+</body>
+</html>
