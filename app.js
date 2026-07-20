@@ -364,6 +364,15 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     rs.onclick=function(){ pushSeedSnap(); state.style=STYLES[Math.floor(Math.random()*STYLES.length)].id; renderChips(); paintPreview(); };
     document.getElementById('rand').parentNode.appendChild(rs);
   }
+  if(!document.getElementById('prevStyle')){
+    function styleIdx(){ for(var i=0;i<STYLES.length;i++) if(STYLES[i].id===state.style) return i; return 0; }
+    var ps=document.createElement('button'); ps.id='prevStyle'; ps.className='sec'; ps.textContent='◀ 스타일';
+    ps.onclick=function(){ pushSeedSnap(); state.style=STYLES[(styleIdx()-1+STYLES.length)%STYLES.length].id; renderChips(); paintPreview(); try{legionTrack('style_nav',{d:-1})}catch(e){} };
+    var ns=document.createElement('button'); ns.id='nextStyle'; ns.className='sec'; ns.textContent='스타일 ▶';
+    ns.onclick=function(){ pushSeedSnap(); state.style=STYLES[(styleIdx()+1)%STYLES.length].id; renderChips(); paintPreview(); try{legionTrack('style_nav',{d:1})}catch(e){} };
+    document.getElementById('rand').parentNode.appendChild(ps);
+    document.getElementById('rand').parentNode.appendChild(ns);
+  }
   if(!document.getElementById('styleOfDay')){
     var sd=document.createElement('button'); sd.id='styleOfDay'; sd.className='sec'; sd.textContent='오늘의 스타일';
     sd.onclick=function(){
