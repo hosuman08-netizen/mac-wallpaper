@@ -169,11 +169,13 @@
     canvas.width = pw;
     canvas.height = ph;
     drawStyle(ctx, pw, ph, state.style, state.seed, state.bright);
+    var dl=0;try{dl=+(localStorage.getItem('mw_dl')||0)}catch(e){}
     document.getElementById('hint').textContent =
-      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style;
+      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'');
   }
 
   function downloadFull() {
+    try{var n=+(localStorage.getItem('mw_dl')||0)+1;localStorage.setItem('mw_dl',n);}catch(e){}
     var off = document.createElement('canvas');
     off.width = state.size.w;
     off.height = state.size.h;
