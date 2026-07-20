@@ -28,9 +28,30 @@
     seed: 42,
     bright: 100
   };
+  var seedStack = []; // undo last seed/style
   var FKEY = 'macWallFavs_v1';
   var canvas = document.getElementById('c');
   var ctx = canvas.getContext('2d');
+  function pushSeedSnap() {
+    try {
+      seedStack.push({ seed: state.seed, style: state.style, bright: state.bright, sizeId: state.size.id });
+      if (seedStack.length > 12) seedStack.shift();
+    } catch (e) {}
+  }
+  function undoSeed() {
+    if (!seedStack.length) return false;
+    var prev = seedStack.pop();
+    state.seed = prev.seed;
+    state.style = prev.style;
+    state.bright = prev.bright || 100;
+    var sz = SIZES.find(function (x) { return x.id === prev.sizeId; });
+    if (sz) state.size = sz;
+    var se = document.getElementById('seed'); if (se) se.value = state.seed;
+    var br = document.getElementById('bright'); if (br) br.value = state.bright;
+    renderChips(); paintPreview();
+    try { legionTrack('undo', { seed: state.seed }); } catch (e) {}
+    return true;
+  }
 
   function mulberry32(a) {
     return function () {
@@ -298,6 +319,7 @@
   }
 
   document.getElementById('seed').onchange = function () {
+    pushSeedSnap();
     state.seed = +this.value || 0;
     try{localStorage.setItem('mw_seed_touched','1');}catch(e){}
     paintPreview();
@@ -307,9 +329,24 @@
     paintPreview();
   };
   document.getElementById('regen').onclick = function () { paintPreview(); try { legionTrack('activate', { regen: 1 }); } catch (e) {} };
+  if(!document.getElementById('undoSeed')){
+    var ub=document.createElement('button'); ub.id='undoSeed'; ub.className='sec'; ub.textContent='↩ 직전 시드';
+    ub.onclick=function(){ if(!undoSeed()){ var n=document.getElementById('hint'); if(n) n.textContent='되돌릴 시드 없음'; } };
+    document.getElementById('rand').parentNode.appendChild(ub);
+  }
+  if(!document.getElementById('brightPresets')){
+    var bp=document.createElement('div'); bp.id='brightPresets'; bp.className='row'; bp.style.cssText='gap:6px;margin-top:8px;flex-wrap:wrap';
+    [{l:'어둡게',v:75},{l:'기본',v:100},{l:'밝게',v:120},{l:'하이키',v:135}].forEach(function(p){
+      var b=document.createElement('button'); b.type='button'; b.className='sec'; b.textContent=p.l;
+      b.onclick=function(){ pushSeedSnap(); state.bright=p.v; var br=document.getElementById('bright'); if(br) br.value=p.v; paintPreview(); try{legionTrack('bright',{v:p.v})}catch(e){} };
+      bp.appendChild(b);
+    });
+    var brightEl=document.getElementById('bright');
+    if(brightEl&&brightEl.parentNode) brightEl.parentNode.appendChild(bp);
+  }
   if(!document.getElementById('randStyle')){
     var rs=document.createElement('button'); rs.id='randStyle'; rs.className='sec'; rs.textContent='스타일 랜덤';
-    rs.onclick=function(){ state.style=STYLES[Math.floor(Math.random()*STYLES.length)].id; renderChips(); paintPreview(); };
+    rs.onclick=function(){ pushSeedSnap(); state.style=STYLES[Math.floor(Math.random()*STYLES.length)].id; renderChips(); paintPreview(); };
     document.getElementById('rand').parentNode.appendChild(rs);
   }
   if(!document.getElementById('styleOfDay')){
@@ -341,6 +378,7 @@
     }catch(e){}
   }
   document.getElementById('rand').onclick = function () {
+    pushSeedSnap();
     state.seed = Math.floor(Math.random() * 999999);
     document.getElementById('seed').value = state.seed;
     paintPreview();
