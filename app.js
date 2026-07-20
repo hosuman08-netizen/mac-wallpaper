@@ -379,6 +379,24 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     document.getElementById('rand').parentNode.appendChild(sd);
   }
   // collection progress: unique styles downloaded
+  function weekDlSpark(){
+    try{
+      var box=document.getElementById('weekDl');
+      if(!box){
+        box=document.createElement('div'); box.id='weekDl';
+        box.style.cssText='display:flex;align-items:flex-end;gap:3px;height:28px;margin-top:8px';
+        var h=document.getElementById('hint'); if(h&&h.parentNode) h.parentNode.appendChild(box);
+      }
+      var vals=[], max=1;
+      for(var i=6;i>=0;i--){
+        var d=new Date(); d.setDate(d.getDate()-i);
+        var k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+        var n=+(localStorage.getItem('mw_day_dl_'+k)||0);
+        vals.push(n); if(n>max)max=n;
+      }
+      box.innerHTML=vals.map(function(n){var h=Math.max(3,Math.round(n/max*24));return '<div style="flex:1;height:'+h+'px;background:'+(n>0?'#e0b552':'#2a2438')+';border-radius:2px" title="'+n+'"></div>';}).join('');
+    }catch(e){}
+  }
   function styleCollection(){
     try{
       var set={};
