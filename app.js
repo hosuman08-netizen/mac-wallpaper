@@ -201,13 +201,14 @@
     canvas.width = pw;
     canvas.height = ph;
     drawStyle(ctx, pw, ph, state.style, state.seed, state.bright);
-    var dl=0;try{dl=+(localStorage.getItem('mw_dl')||0)}catch(e){}
+    var dl=0,sc=0;try{dl=+(localStorage.getItem('mw_dl')||0);sc=(JSON.parse(localStorage.getItem('mw_streak')||'{}').count||0)}catch(e){}
     document.getElementById('hint').textContent =
-      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'');
+      '미리보기 ' + pw + '×' + ph + ' · 다운로드 ' + state.size.w + '×' + state.size.h + ' · ' + state.style + (dl?' · 다운 '+dl:'') + (sc?' · 🔥'+sc+'일':'') + ' · 오늘의 시드';
   }
 
   function downloadFull() {
     try{var n=+(localStorage.getItem('mw_dl')||0)+1;localStorage.setItem('mw_dl',n);}catch(e){}
+    var st=bumpDlStreak();
     var off = document.createElement('canvas');
     off.width = state.size.w;
     off.height = state.size.h;
@@ -220,7 +221,22 @@
       a.download = 'mac-wallpaper-' + state.style + '-' + state.size.w + 'x' + state.size.h + '-' + state.seed + '.png';
       a.click();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
-      try { if (window.legionTrack) legionTrack('activate', { dl: 1, style: state.style, w: state.size.w }); } catch (e) {}
+      // auto-fav on 3rd+ dl same style
+      try{
+        var sk='mw_style_dl_'+state.style;
+        var c=+(localStorage.getItem(sk)||0)+1; localStorage.setItem(sk,String(c));
+        if(c===3){
+          var favs=loadFavs();
+          favs.unshift({ style: state.style, seed: state.seed, bright: state.bright, sizeId: state.size.id, t: Date.now() });
+          saveFavs(favs); renderFavs();
+        }
+      }catch(e){}
+      paintPreview();
+      try { if (window.legionTrack) legionTrack('activate', { dl: 1, style: state.style, w: state.size.w, streak: st.count||0 }); } catch (e) {}
+      try { if (window.legionTrack) legionTrack('share_peak_shown', { style: state.style }); } catch (e) {}
+      // soft share nudge
+      var n=document.getElementById('hint');
+      if(n) n.textContent='다운로드 완료 · 🔥'+(st.count||1)+'일 · 링크 공유로 같은 시드 전달';
     }, 'image/png');
   }
 
@@ -281,6 +297,7 @@
 
   document.getElementById('seed').onchange = function () {
     state.seed = +this.value || 0;
+    try{localStorage.setItem('mw_seed_touched','1');}catch(e){}
     paintPreview();
   };
   document.getElementById('bright').oninput = function () {
@@ -323,11 +340,37 @@
     alert('링크 복사됨');
   };
 
+  // daily seed of day + streak helpers
+  function dayKey(){
+    var d=new Date();
+    return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  }
+  function bumpDlStreak(){
+    try{
+      var st=JSON.parse(localStorage.getItem('mw_streak')||'{}');
+      var t=dayKey();
+      if(st.last===t) return st;
+      var y=new Date(); y.setDate(y.getDate()-1);
+      var yk=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();
+      st.count=(st.last===yk)?(st.count||0)+1:1;
+      st.last=t;
+      localStorage.setItem('mw_streak',JSON.stringify(st));
+      try{legionTrack('streak',{count:st.count})}catch(e){}
+      return st;
+    }catch(e){return {count:0};}
+  }
+
   // URL params
   try {
     var q = new URLSearchParams(location.search);
     if (q.get('style')) state.style = q.get('style');
     if (q.get('seed')) state.seed = +q.get('seed') || state.seed;
+    else if (!localStorage.getItem('mw_seed_touched')) {
+      // seed of day (deterministic)
+      var t=dayKey();
+      var h=0; for(var i=0;i<t.length;i++) h=(h*31+t.charCodeAt(i))>>>0;
+      state.seed = (h % 900000) + 42;
+    }
     document.getElementById('seed').value = state.seed;
   } catch (e) {}
 
