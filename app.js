@@ -197,6 +197,7 @@
   }
 
   function paintPreview() {
+    try{var dk=new Date().toDateString();if(localStorage.getItem('mw_dayseed')!==dk){localStorage.setItem('mw_dayseed',dk);state.seed=(state.seed|0)+7;var se=document.getElementById('seed');if(se)se.value=state.seed;}}catch(e){}
     var pw = 1280, ph = Math.round(1280 * state.size.h / state.size.w);
     canvas.width = pw;
     canvas.height = ph;
