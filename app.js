@@ -436,7 +436,8 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
         meta=document.createElement('p'); meta.id='weekDlMeta'; meta.className='hint';
         if(box.parentNode) box.parentNode.insertBefore(meta, box);
       }
-      meta.textContent='오늘 다운 '+tdl+'/'+goal+(tdl>=goal?' ✓':'')+' · 7일 활동일 '+active+'/7';
+      var favN=0; try{ favN=loadFavs().length; }catch(e4){}
+      meta.textContent='오늘 다운 '+tdl+'/'+goal+(tdl>=goal?' ✓':'')+' · 7일 활동일 '+active+'/7'+(favN?' · 즐겨찾기 '+favN:'');
       var bar=document.getElementById('weekDlGoal');
       if(!bar){
         bar=document.createElement('div'); bar.id='weekDlGoal';
