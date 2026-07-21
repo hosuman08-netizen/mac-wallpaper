@@ -383,6 +383,21 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
     document.getElementById('rand').parentNode.appendChild(psz);
     document.getElementById('rand').parentNode.appendChild(nsz);
   }
+  if(!document.getElementById('surpriseMix')){
+    var sm=document.createElement('button'); sm.id='surpriseMix'; sm.className='primary'; sm.textContent='✨ 깜짝 조합';
+    sm.onclick=function(){
+      pushSeedSnap();
+      state.style=STYLES[Math.floor(Math.random()*STYLES.length)].id;
+      state.seed=Math.floor(Math.random()*999999);
+      state.bright=70+Math.floor(Math.random()*50);
+      var se=document.getElementById('seed'); if(se) se.value=state.seed;
+      var br=document.getElementById('bright'); if(br) br.value=state.bright;
+      try{localStorage.setItem('mw_seed_touched','1');}catch(e){}
+      renderChips(); paintPreview();
+      try{legionTrack('activate',{surprise:1,style:state.style})}catch(e){}
+    };
+    document.getElementById('rand').parentNode.appendChild(sm);
+  }
   if(!document.getElementById('styleOfDay')){
     var sd=document.createElement('button'); sd.id='styleOfDay'; sd.className='sec'; sd.textContent='오늘의 스타일';
     sd.onclick=function(){
@@ -406,14 +421,31 @@ try{if(!sessionStorage.getItem('lw_p45_mac_wall_session_counter')){sessionStorag
         box.style.cssText='display:flex;align-items:flex-end;gap:3px;height:28px;margin-top:8px';
         var h=document.getElementById('hint'); if(h&&h.parentNode) h.parentNode.appendChild(box);
       }
-      var vals=[], max=1;
+      var vals=[], max=1, active=0;
       for(var i=6;i>=0;i--){
         var d=new Date(); d.setDate(d.getDate()-i);
         var k=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
         var n=+(localStorage.getItem('mw_day_dl_'+k)||0);
-        vals.push(n); if(n>max)max=n;
+        vals.push(n); if(n>max)max=n; if(n>0)active++;
       }
       box.innerHTML=vals.map(function(n){var h=Math.max(3,Math.round(n/max*24));return '<div style="flex:1;height:'+h+'px;background:'+(n>0?'#e0b552':'#2a2438')+';border-radius:2px" title="'+n+'"></div>';}).join('');
+      var tdl=+(localStorage.getItem('mw_day_dl_'+dayKey())||0);
+      var goal=2, gPct=Math.min(100,Math.round(tdl/goal*100));
+      var meta=document.getElementById('weekDlMeta');
+      if(!meta){
+        meta=document.createElement('p'); meta.id='weekDlMeta'; meta.className='hint';
+        if(box.parentNode) box.parentNode.insertBefore(meta, box);
+      }
+      meta.textContent='오늘 다운 '+tdl+'/'+goal+(tdl>=goal?' ✓':'')+' · 7일 활동일 '+active+'/7';
+      var bar=document.getElementById('weekDlGoal');
+      if(!bar){
+        bar=document.createElement('div'); bar.id='weekDlGoal';
+        bar.style.cssText='height:5px;background:#1c1826;border-radius:4px;margin:4px 0 6px;overflow:hidden';
+        if(meta.parentNode) meta.parentNode.insertBefore(bar, box);
+        var iel=document.createElement('i'); iel.style.cssText='display:block;height:100%;background:linear-gradient(90deg,#e0b552,#67e8f9)';
+        bar.appendChild(iel);
+      }
+      var i2=bar.querySelector('i'); if(i2) i2.style.width=gPct+'%';
     }catch(e){}
   }
   function styleCollection(){
